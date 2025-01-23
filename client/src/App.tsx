@@ -1,8 +1,6 @@
+import axios from "axios";
 import { useEffect, useState } from "react";
 import "./App.css";
-import axios from "axios";
-import { DatePicker } from "antd";
-import Paragraph from "antd/es/typography/Paragraph";
 
 function App() {
   const [activities, setActivities] = useState([]);
@@ -26,12 +24,6 @@ function App() {
           <li key={activity.id}>{activity.title}</li>
         ))}
       </ul>
-      <DatePicker
-        onChange={(date, dateString) =>
-          console.log("date", date, "dateString", dateString)
-        }
-      />
-      <Paragraph copyable>This is a copyable text. aasdasdasd</Paragraph>
     </>
   );
 }

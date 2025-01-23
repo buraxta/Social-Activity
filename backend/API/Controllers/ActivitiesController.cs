@@ -1,26 +1,48 @@
+using Application.Activities;
+using Application.Activities.Dtos;
 using Domain;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Persistence;
+using Serilog;
 
 namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ActivitiesController(DataContext context) : BaseApiController
+    public class ActivitiesController : BaseApiController
     {
-        private readonly DataContext _context = context;
-
         [HttpGet]
-        public async Task<ActionResult<List<Activity>>> GetActivities()
+        public async Task<ActionResult<List<Activity>>> GetActivities(CancellationToken ct)
         {
-            return await _context.Activities.ToListAsync();
+            return await Mediator.Send(new List.Query(), ct);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Activity>> GetActivity(Guid id)
         {
-            return await _context.Activities.FindAsync(id);
+            return await Mediator.Send(new Details.Query { Id = id });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateActivity(Activity activity)
+        {
+            await Mediator.Send(new Create.Command { Activity = activity });
+            return NoContent();
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> EditActivity(Guid id, ActivityDto activity)
+        {
+            activity.Id = id;
+            await Mediator.Send(new Edit.Command { Activity = activity });
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteActivity(Guid id)
+        {
+            await Mediator.Send(new Delete.Command { Id = id });
+            return NoContent();
         }
     }
 }

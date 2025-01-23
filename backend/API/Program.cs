@@ -1,28 +1,20 @@
+using API.Extensions;
+using Application.Activities;
+using Application.Core;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
-builder.Services.AddSwaggerGen();
-builder.Services.AddDbContext<DataContext>(opt =>
-{
-    opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
-});
+builder.Services.AddApplicationServices(builder.Configuration);
 
-//add cors
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy(
-        "CorsPolicy",
-        policy =>
-        {
-            policy.WithOrigins("http://localhost:3000").AllowAnyHeader().AllowAnyMethod();
-        }
-    );
-});
-
+// Log.Logger = new LoggerConfiguration().MinimumLevel.Information().WriteTo.Console().CreateLogger();
+builder.Host.UseSerilog(
+    (context, configuration) => configuration.MinimumLevel.Debug().WriteTo.Console()
+);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
